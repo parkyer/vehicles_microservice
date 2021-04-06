@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id_client: 1
+  tipo: MyString
+  tamano: MyString
+  descripcion: MyText
+
+two:
+  id_client: 1
+  tipo: MyString
+  tamano: MyString
+  descripcion: MyText
