@@ -1,0 +1,38 @@
+FROM ruby:3.0.0
+
+ENV APP_PATH /var/app
+ENV BUNDLE_VERSION 2.2.3
+ENV BUNDLE_PATH /usr/local/bundle/gems 
+ENV TMP_PATH /tmp/
+ENV RAILS_LOG_TO_STDOUT true 
+ENV RAILS_PORT 3000 
+
+COPY ./dev-docker-entrypoint.sh /usr/local/bin/dev-entrypoint.sh 
+COPY ./test-docker-entrypoint.sh /usr/local/bin/test-entrypoint.sh
+RUN chmod +x /usr/local/bin/dev-entrypoint.sh && chmod +x /usr/local/bin/test-entrypoint.sh 
+
+#setup deps for rails
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    postgresql-server-dev-11\
+    postgresql-client \ 
+    libxml2-dev \
+    libxslt-dev \
+    nodejs \
+    yarn \
+    imagemagick \
+    tzdata \
+    less;\
+    rm -rf /var/cache/apt/* ;\
+    mkdir -p /usr/src/ruby
+
+RUN gem install bundler --version "$BUNDLE_VERSION" \
+&& rm -rf $GEM_HOME/cache/*
+
+WORKDIR $APP_PATH
+
+EXPOSE $RAILS_PORT
+
+ENTRYPOINT [ "bundle", "exec" ]
+

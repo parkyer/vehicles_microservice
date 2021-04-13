@@ -1,0 +1,60 @@
+version: '3'
+networks:
+    development: 
+    test:
+volumes:
+    db_data:
+    gem_cache:
+    shared_data:
+services:
+    vehiculos_db:
+        image: postgres:13.2
+        container_name: vehiculos_db
+        volumes: 
+            - db_data:/var/lib/postgresql/data
+            - shared_data:/var/shared
+        networks: 
+            - development
+            - test
+        ports:
+            - 5099:5432
+    vehiculos_ms:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: vehiculos_ms
+        volumes:
+            - .:/var/app
+            - shared_data:/var/shared
+            - gem_cache:/usr/local/bundle/gems
+        networks:
+            - development
+        ports:
+            - 3000:3000
+        stdin_open: true
+        tty: true
+        env_file: .env.development 
+        entrypoint: dev-entrypoint.sh
+        command: ['rails', 's', '-p', '3000', '-b', '0.0.0.0']
+        depends_on:
+            - vehiculos_db
+    vehiculos_test:
+        image: vehiculos_vehiculos_ms
+        container_name: vehiculos_test
+        volumes: 
+            - .:/var/app
+            - shared_data:/var/shared
+            - gem_cache:/usr/local/bundle/gems
+        networks:
+            - test
+        ports:
+            - 3001:3000
+        stdin_open: true
+        tty: true
+        env_file: .env.test
+        entrypoint: test-entrypoint.sh
+        command: ["rails", "-v"]
+        depends_on:
+            - vehiculos_db
+
+
